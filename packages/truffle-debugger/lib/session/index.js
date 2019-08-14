@@ -26,7 +26,7 @@ export default class Session {
    * txHash parameter is now optional!
    * @private
    */
-  constructor(contracts, files, provider, txHash) {
+  constructor(contracts, files, provider, networkType, txHash) {
     /**
      * @private
      */
@@ -55,7 +55,7 @@ export default class Session {
     });
 
     //note that txHash is now optional
-    this._store.dispatch(actions.start(provider, txHash));
+    this._store.dispatch(actions.start(provider,networkType, txHash));
   }
 
   async ready() {

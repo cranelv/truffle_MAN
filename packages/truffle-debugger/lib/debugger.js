@@ -49,6 +49,7 @@ export default class Debugger {
       options.contracts,
       options.files,
       options.provider,
+      options.networkType,
       txHash
     );
 
@@ -75,7 +76,8 @@ export default class Debugger {
     let session = new Session(
       options.contracts,
       options.files,
-      options.provider
+      options.provider,
+      options.networkType
     );
 
     await session.ready();

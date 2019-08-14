@@ -53,7 +53,7 @@ export function* saga() {
 
   debug("waiting for start");
   // wait for start signal
-  let { txHash, provider } = yield take(actions.START);
+  let { txHash, provider,networkType } = yield take(actions.START);
   debug("starting");
 
   debug("visiting ASTs");
@@ -65,7 +65,7 @@ export function* saga() {
   yield* data.recordAllocations();
 
   //initialize web3 adapter
-  yield* web3.init(provider);
+  yield* web3.init(provider,networkType);
 
   //process transaction (if there is one)
   //(note: this part may also set the error state)

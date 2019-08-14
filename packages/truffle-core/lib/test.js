@@ -13,7 +13,7 @@ const expect = require("truffle-expect");
 const Migrate = require("truffle-migrate");
 const Profiler = require("truffle-compile/profiler");
 const originalrequire = require("original-require");
-
+const Web3Shim = require("truffle-interface-adapter").Web3Shim;
 chai.use(require("./assertions"));
 
 const Test = {
@@ -36,8 +36,13 @@ const Test = {
 
     // `accounts` will be populated before each contract() invocation
     // and passed to it so tests don't have to call it themselves.
-    const web3 = new Web3();
-    web3.setProvider(config.provider);
+    const web3 = new Web3Shim({
+      provider: config.provider,
+      networkType: config.networks[config.network].type
+    });
+
+//    const web3 = new Web3();
+//    web3.setProvider(config.provider);
 
     // Override console.warn() because web3 outputs gross errors to it.
     // e.g., https://github.com/ethereum/web3.js/blob/master/lib/web3/allevents.js#L61

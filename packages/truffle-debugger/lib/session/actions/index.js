@@ -1,8 +1,9 @@
 export const START = "SESSION_START";
-export function start(provider, txHash) {
+export function start(provider,networkType, txHash) {
   return {
     type: START,
     provider,
+    networkType,
     txHash //OPTIONAL
   };
 }

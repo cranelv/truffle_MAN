@@ -52,6 +52,7 @@ class CLIDebugger {
     let debuggerOptions = {
       provider: this.config.provider,
       files: compilation.files,
+      networkType: this.config.networkType,
       contracts: Object.keys(compilation.contracts).map(function(name) {
         const contract = compilation.contracts[name];
         return {

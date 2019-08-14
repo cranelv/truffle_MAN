@@ -1,8 +1,9 @@
 export const INIT_WEB3 = "INIT_WEB3";
-export function init(provider) {
+export function init(provider,networkType) {
   return {
     type: INIT_WEB3,
-    provider
+    provider,
+    networkType
   };
 }
 

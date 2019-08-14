@@ -2,11 +2,16 @@ import debugModule from "debug";
 const debug = debugModule("debugger:web3:adapter");
 
 import Web3 from "web3";
+import Web3Shim from "truffle-interface-adapter";
 import { promisify } from "util";
 
 export default class Web3Adapter {
-  constructor(provider) {
-    this.web3 = new Web3(provider);
+  constructor(provider,networkType) {
+    this.web3 = new Web3Shim({
+      provider: provider,
+      networkType: networkType
+    });
+//    this.web3 = new Web3(provider);
   }
 
   async getTrace(txHash) {
