@@ -1,4 +1,4 @@
-var MBCToken = artifacts.require("./MBCToken.sol");
+var EcoSystem = artifacts.require("./EcoSystem.sol");
 module.exports = function(deployer) {
-    deployer.deploy(MBCToken);
+    deployer.deploy(EcoSystem);
 };

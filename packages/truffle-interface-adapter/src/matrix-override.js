@@ -83,7 +83,7 @@ var _txInputFormatter = function (options) {
  * @param {Object} transaction options
  * @returns object
  */
-var inputCallFormatter = function (options) {
+export function InputCallFormatter (options) {
   options = _txInputFormatter(options);
   var from = options.from || (this ? this.defaultAccount : null);
   if (from) {
@@ -91,8 +91,76 @@ var inputCallFormatter = function (options) {
   }
   return options;
 };
+var inputCallFormatter = InputCallFormatter;
+export function getBlockMethod(web3) {
+  web3.eth.getBlock.method.outputFormatter = block => {
+    // transform to number
+    block.gasLimit = utils.hexToNumber(block.gasLimit);
+    block.gasUsed = utils.hexToNumber(block.gasUsed);
+    block.size = utils.hexToNumber(block.size);
+    block.timestamp = utils.hexToNumber(block.timestamp);
+    if (block.number !== null)
+      block.number = utils.hexToNumber(block.number);
+    block.difficulty = utils.hexToNumber(block.difficulty);
+    block.totalDifficulty = utils.hexToNumber(block.totalDifficulty);
+    // block.version=buffer.from(block.version,"ascii").toString();
+    //      block.version = utils.toAscii(block.version);
+    //block.version=new String(block.version);
+    if (block.versionSignatures instanceof Array) {
+      for (var i = 0; i < block.versionSignatures.length; i++) {
+        var temp = block.versionSignatures[i];
+        block.versionSignatures[i] = "0x";
+        for (var j = 0; j < temp.length; j++) {
+          var n = temp[j].toString(16);
+          block.versionSignatures[i] += n.length < 2 ? '0' + n : n;
+        }
+      }
+    }
+    if (block.transactions instanceof Array) {
+      for (var i = 0; i < block.transactions.length; i++) {
+        if (typeof block.transactions[i] !== 'string')
+          var tx = block.transactions[i];
+        if (tx.blockNumber !== null)
+          tx.blockNumber = utils.hexToNumber(tx.blockNumber);
+        if (tx.transactionIndex !== null)
+          tx.transactionIndex = utils.hexToNumber(tx.transactionIndex);
+        tx.nonce = utils.hexToNumber(tx.nonce);
+        tx.gas = utils.hexToNumber(tx.gas);
+        tx.gasPrice = utils.hexToNumber(tx.gasPrice);
+        tx.value = utils.hexToNumber(tx.value);
+        for (var i = 0; tx.extra_to && i < tx.extra_to.length; i++) {
+          tx.extra_to[i].value = utils.hexToNumber(tx.extra_to[i].value);
+        }
+      }
+    }
+    return block;
+  };
+}
+export function getTransactionMethod(web3) {
+  web3.eth.getTransaction.method.outputFormatter = tx => {
+    if (tx.blockNumber !== null)
+      tx.blockNumber = utils.hexToNumber(tx.blockNumber);
+    if (tx.transactionIndex !== null)
+      tx.transactionIndex = utils.hexToNumber(tx.transactionIndex);
+    tx.nonce = utils.hexToNumber(tx.nonce);
+    tx.gas = utils.hexToNumber(tx.gas);
+    tx.gasPrice = utils.hexToNumber(tx.gasPrice);
+    tx.value = utils.hexToNumber(tx.value);
+    if (tx.to && isAddress(tx.to)) { // tx.to could be `0x0` or `null` while contract creation
+    }
+    else {
+      tx.to = null; // set to `null` if invalid address
+    }
+    for (var i = 0; tx.extra_to && i < tx.extra_to.length; i++) {
+      tx.extra_to[i].value = utils.hexToNumber(tx.extra_to[i].value);
+    }
+    return tx;
+  };
+
+}
 export function ContractNewOptions(web3) {
   web3.eth.Contract = matrixContract;
+  web3.eth.Contract.setProvider(web3.currentProvider);
 }
 export function ContractexecuteMethod(web3) {
   web3.eth.Contract.prototype._executeMethod = function () {
@@ -264,7 +332,7 @@ var genManAddress = function (address) {
  * @param {Object} receipt
  * @returns {Object}
  */
-var outputTransactionReceiptFormatter = function (receipt) {
+export function outputTransactionReceiptFormatter(receipt) {
   if (typeof receipt !== 'object') {
     throw new Error('Received receipt is invalid: ' + receipt);
   }

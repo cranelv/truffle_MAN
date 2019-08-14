@@ -23,7 +23,9 @@
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
-
+const Web3 = require("web3");
+let net = require('net');
+let ipcProvider = new Web3.providers.IpcProvider("/home/cranelv/work/src/github.com/MatrixAINetwork/go-matrix/Jerry/datav/data/gman.ipc", net);
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -45,10 +47,12 @@ module.exports = {
      development: {
       host: "127.0.0.1",     // Localhost (default: none)
       port: 8341,            // Standard Ethereum port (default: none)
-      network_id: 4,       // Any network (default: none)
+      network_id: 1,       // Any network (default: none)
       type:"matrix",
       dryRun:false,
-      skipDryRun:true
+      skipDryRun:true,
+      provider: ipcProvider,
+      from : "MAN.2AmKUD6p9DjvcBzUADMhbVHQfewWz"
      },
 
     // Another network with more advanced options...

@@ -1,24 +1,12 @@
 import BN from "bn.js";
 import { Web3Shim } from "./web3-shim";
-import { Iban } from "web3-eth-iban";
-import utils from "web3-utils";
-import { ContractNewOptions,balanceOutputFormatter,getcodeInputFormatter } from  "../src/matrix-override.js";
-//import aiman from 'aiman';
-//import { Callback } from "web3/types";
+import { ContractNewOptions,balanceOutputFormatter,getcodeInputFormatter,InputAddressFormatter,confirmTransaction,getBlockMethod,getTransactionMethod,outputTransactionReceiptFormatter,InputCallFormatter } from  "../src/matrix-override.js";
 
 export const MatrixDefinition = {
   async initNetworkType (web3: Web3Shim) {
     console.log("Welcome to Matrix AI Network");
-//    let provider = web3.eth.currentProvider;
-//    const man = new aiman(provider);
-//    web3.eth = man.man;
-//    web3.eth.setProvider(provider);
-//    web3.eth.net.setProvider(provider);
-    // truffle has started expecting gas used/limit to be
-    // hex strings to support bignumbers for other ledgers
     for (let key in overrides) {
       if (overrides.hasOwnProperty(key)) {
-        // @ts-ignore
         overrides[key](web3);
       }
     }
@@ -46,30 +34,19 @@ function bigNumbertoHex(value : string){
 function bigNumbertoDecimal(value : string){
   return new BN(value).toString(10);
 }
-var inputAddressFormatter = function (address : string) {
-  var iban = new Iban(address);
-  if (iban.isValid() && iban.isDirect()) {
-    return iban.toAddress();
-  } else if (isStrictAddress(address)) {
-    return address;
-  } else if (isAddress(address)) {
-    return address;
-  }
-  throw new Error('invalid address');
-};
+
 var isBoolean = function (object : any) {
   return typeof object === 'boolean';
 };
 var isArray = function (object : any) {
   return object instanceof Array;
 };
-const overrides = {
+const overrides: { [x: string]: (arg0: Web3Shim) => void } = {
   // The ts-ignores are ignoring the checks that are
   // saying that web3.eth.getBlock is a function and doesn't
   "contractNewOptions": (web3:Web3Shim) => { ContractNewOptions(web3); },
   // "executeMethod":(web3: Web3Shim) => {ContractexecuteMethod (web3);},
   "getAccounts": (web3:Web3Shim) => {
-    // @ts-ignore
     // @ts-ignore
     web3.eth.getAccounts.method.outputFormatter = accounts => {
       // @ts-ignore
@@ -99,99 +76,33 @@ const overrides = {
   */
   "estimateGas": (web3:Web3Shim) => {
     // @ts-ignore
-    // @ts-ignore
-    web3.eth.estimateGas.method.inputFormatter = [inputCallFormatter];
+    web3.eth.estimateGas.method.inputFormatter = [InputCallFormatter];
   },
   "getBalanceInput": (web3:Web3Shim) => {
     // @ts-ignore
-    // @ts-ignore
-    web3.eth.getBalance.method.inputFormatter[0] = matrix_override_js_1.InputAddressFormatter;
+    web3.eth.getBalance.method.inputFormatter[0] = InputAddressFormatter;
   },
   "getBalanceOutput": (web3:Web3Shim) => {
     balanceOutputFormatter(web3);
   },
   "sendTransaction": (web3:Web3Shim) => {
     // @ts-ignore
-    // @ts-ignore
-    web3.eth.sendTransaction.method.inputFormatter = [inputCallFormatter];
+    web3.eth.sendTransaction.method.inputFormatter = [InputCallFormatter];
   },
   "sendTransactionConfirm": (web3:Web3Shim) => {
     // @ts-ignore
-    // @ts-ignore
-    web3.eth.sendTransaction.method._confirmTransaction = matrix_override_js_1.confirmTransaction;
+    web3.eth.sendTransaction.method._confirmTransaction = confirmTransaction;
   },
   "getTransactionReceipt": (web3:Web3Shim) => {
-    // @ts-ignore
     // @ts-ignore
     web3.eth.getTransactionReceipt.method.outputFormatter = outputTransactionReceiptFormatter;
   },
   "getBlock": (web3:Web3Shim) => {
-    // @ts-ignore
-    // @ts-ignore
-    web3.eth.getBlock.method.outputFormatter = block => {
-      // transform to number
-      block.gasLimit = utils.hexToNumber(block.gasLimit);
-      block.gasUsed = utils.hexToNumber(block.gasUsed);
-      block.size = utils.hexToNumber(block.size);
-      block.timestamp = utils.hexToNumber(block.timestamp);
-      if (block.number !== null)
-        block.number = utils.hexToNumber(block.number);
-      block.difficulty = utils.hexToNumber(block.difficulty);
-      block.totalDifficulty = utils.hexToNumber(block.totalDifficulty);
-      // block.version=buffer.from(block.version,"ascii").toString();
-      //      block.version = utils.toAscii(block.version);
-      //block.version=new String(block.version);
-      if (block.versionSignatures instanceof Array) {
-        for (var i = 0; i < block.versionSignatures.length; i++) {
-          var temp = block.versionSignatures[i];
-          block.versionSignatures[i] = "0x";
-          for (var j = 0; j < temp.length; j++) {
-            var n = temp[j].toString(16);
-            block.versionSignatures[i] += n.length < 2 ? '0' + n : n;
-          }
-        }
-      }
-      if (block.transactions instanceof Array) {
-        for (var i = 0; i < block.transactions.length; i++) {
-          if (typeof block.transactions[i] !== 'string')
-            var tx = block.transactions[i];
-          if (tx.blockNumber !== null)
-            tx.blockNumber = utils.hexToNumber(tx.blockNumber);
-          if (tx.transactionIndex !== null)
-            tx.transactionIndex = utils.hexToNumber(tx.transactionIndex);
-          tx.nonce = utils.hexToNumber(tx.nonce);
-          tx.gas = utils.hexToNumber(tx.gas);
-          tx.gasPrice = utils.hexToNumber(tx.gasPrice);
-          tx.value = utils.hexToNumber(tx.value);
-          for (var i = 0; tx.extra_to && i < tx.extra_to.length; i++) {
-            tx.extra_to[i].value = utils.hexToNumber(tx.extra_to[i].value);
-          }
-        }
-      }
-      return block;
-    };
+    getBlockMethod(web3);
   },
   "getCode": (web3:Web3Shim) => { getcodeInputFormatter(web3); },
   "getTransaction": (web3:Web3Shim) => {
-    // @ts-ignore
-    web3.eth.getTransaction.method.outputFormatter = tx => {
-      if (tx.blockNumber !== null)
-        tx.blockNumber = utils.hexToNumber(tx.blockNumber);
-      if (tx.transactionIndex !== null)
-        tx.transactionIndex = utils.hexToNumber(tx.transactionIndex);
-      tx.nonce = utils.hexToNumber(tx.nonce);
-      tx.gas = utils.hexToNumber(tx.gas);
-      tx.gasPrice = utils.hexToNumber(tx.gasPrice);
-      tx.value = utils.hexToNumber(tx.value);
-      if (tx.to && isAddress(tx.to)) { // tx.to could be `0x0` or `null` while contract creation
-      }
-      else {
-        tx.to = null; // set to `null` if invalid address
-      }
-      for (var i = 0; tx.extra_to && i < tx.extra_to.length; i++) {
-        tx.extra_to[i].value = utils.hexToNumber(tx.extra_to[i].value);
-      }
-      return tx;
-    };
+    getTransactionMethod(web3);
   }
+
 };
