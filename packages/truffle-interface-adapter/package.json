@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "aiman": "file:../../backup/npm/aiman",
+    "matrix-contract": "file:../../backup/npm/matrix-contract",
     "bn.js": "^4.11.8",
     "ethers": "^4.0.32",
     "web3": "1.0.0-beta.37",
@@ -32,9 +33,6 @@
     "@types/bn.js": "^4.11.4",
     "@types/mocha": "^5.2.6",
     "@types/web3": "^1.0.18",
-    "@types/web3-core": "file:../../backup/web3-core",
-    "@types/web3-core-helpers": "file:../../backup/web3-core-helpers",
-    "@types/aiman": "file:../../backup/aiman",
     "ganache-core": "2.5.7",
     "mocha": "^6.0.2",
     "ts-node": "^8.0.3",
