@@ -91,7 +91,7 @@ var inputCallFormatter = function (options) {
   }
   return options;
 };
-export ContractNewOptions(web3) {
+export function ContractNewOptions(web3) {
   web3.eth.Contract = matrixContract;
 }
 export function ContractexecuteMethod(web3) {

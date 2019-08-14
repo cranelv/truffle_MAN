@@ -1,7 +1,8 @@
 import BN from "bn.js";
 import { Web3Shim } from "./web3-shim";
 import { Iban } from "web3-eth-iban";
-import { ContractexecuteMethod } from  "../src/matrix-override.js";
+import utils from "web3-utils";
+import { ContractNewOptions,balanceOutputFormatter,getcodeInputFormatter } from  "../src/matrix-override.js";
 //import aiman from 'aiman';
 //import { Callback } from "web3/types";
 
@@ -15,13 +16,13 @@ export const MatrixDefinition = {
 //    web3.eth.net.setProvider(provider);
     // truffle has started expecting gas used/limit to be
     // hex strings to support bignumbers for other ledgers
-    overrides.getAccounts(web3);
-    overrides.getBlock(web3);
-    overrides.getTransaction(web3);
-    overrides.getTransactionReceipt(web3);
-    overrides.getOrSetDefaultOptions(web3);
-    overrides.executeMethod(web3);
-   }
+    for (let key in overrides) {
+      if (overrides.hasOwnProperty(key)) {
+        // @ts-ignore
+        overrides[key](web3);
+      }
+    }
+  }
 }
 
 var isStrictAddress = function (address : string) {
@@ -63,10 +64,11 @@ var isArray = function (object : any) {
   return object instanceof Array;
 };
 const overrides = {
-// The ts-ignores are ignoring the checks that are
-// saying that web3.eth.getBlock is a function and doesn't
-  "executeMethod": (web3: Web3Shim) => ContractexecuteMethod,
-  "getAccounts": (web3: Web3Shim) => {
+  // The ts-ignores are ignoring the checks that are
+  // saying that web3.eth.getBlock is a function and doesn't
+  "contractNewOptions": (web3:Web3Shim) => { ContractNewOptions(web3); },
+  // "executeMethod":(web3: Web3Shim) => {ContractexecuteMethod (web3);},
+  "getAccounts": (web3:Web3Shim) => {
     // @ts-ignore
     // @ts-ignore
     web3.eth.getAccounts.method.outputFormatter = accounts => {
@@ -76,10 +78,11 @@ const overrides = {
       return accounts[0];
     };
   },
+  /*
   "getOrSetDefaultOptions" : (web3: Web3Shim) => {
     web3.eth.Contract.prototype._getOrSetDefaultOptions = function getOrSetDefaultOptions(options : any) {
       var gasPrice = options.gasPrice ? String(options.gasPrice): null;
-      var from = options.from ? inputAddressFormatter(options.from) : null;
+      var from = options.from ? InputAddressFormatter(options.from) : null;
 
       options.data = options.data || this.options.data;
 
@@ -93,47 +96,50 @@ const overrides = {
       return options;
     };
   },
-  "estimateGas": (web3: Web3Shim) => {
+  */
+  "estimateGas": (web3:Web3Shim) => {
     // @ts-ignore
     // @ts-ignore
-    web3.eth.estimateGas.method.outputFormatter = function (options){
-
-      if (options.from) {
-        options.from = inputAddressFormatter(options.from);
-      }
-
-      if (options.to) { // it might be contract creation
-        options.to = inputAddressFormatter(options.to);
-      }
-
-      ['gasPrice', 'gas', 'value', 'nonce'].filter(function (key) {
-        return options[key] !== undefined;
-      }).forEach(function(key){
-        options[key] = bigNumbertoHex(options[key]);
-      });
-
-      return options;
-    };
+    web3.eth.estimateGas.method.inputFormatter = [inputCallFormatter];
   },
-  "getBlock": (web3: Web3Shim) => {
+  "getBalanceInput": (web3:Web3Shim) => {
     // @ts-ignore
-
+    // @ts-ignore
+    web3.eth.getBalance.method.inputFormatter[0] = matrix_override_js_1.InputAddressFormatter;
+  },
+  "getBalanceOutput": (web3:Web3Shim) => {
+    balanceOutputFormatter(web3);
+  },
+  "sendTransaction": (web3:Web3Shim) => {
+    // @ts-ignore
+    // @ts-ignore
+    web3.eth.sendTransaction.method.inputFormatter = [inputCallFormatter];
+  },
+  "sendTransactionConfirm": (web3:Web3Shim) => {
+    // @ts-ignore
+    // @ts-ignore
+    web3.eth.sendTransaction.method._confirmTransaction = matrix_override_js_1.confirmTransaction;
+  },
+  "getTransactionReceipt": (web3:Web3Shim) => {
+    // @ts-ignore
+    // @ts-ignore
+    web3.eth.getTransactionReceipt.method.outputFormatter = outputTransactionReceiptFormatter;
+  },
+  "getBlock": (web3:Web3Shim) => {
+    // @ts-ignore
     // @ts-ignore
     web3.eth.getBlock.method.outputFormatter = block => {
-
       // transform to number
-      block.gasLimit = bigNumbertoDecimal(block.gasLimit);
-      block.gasUsed = bigNumbertoDecimal(block.gasUsed);
-      block.size = bigNumbertoDecimal(block.size);
-      block.timestamp = bigNumbertoDecimal(block.timestamp);
+      block.gasLimit = utils.hexToNumber(block.gasLimit);
+      block.gasUsed = utils.hexToNumber(block.gasUsed);
+      block.size = utils.hexToNumber(block.size);
+      block.timestamp = utils.hexToNumber(block.timestamp);
       if (block.number !== null)
-        block.number = bigNumbertoDecimal(block.number);
-
-      block.difficulty = bigNumbertoDecimal(block.difficulty);
-      block.totalDifficulty = bigNumbertoDecimal(block.totalDifficulty);
+        block.number = utils.hexToNumber(block.number);
+      block.difficulty = utils.hexToNumber(block.difficulty);
+      block.totalDifficulty = utils.hexToNumber(block.totalDifficulty);
       // block.version=buffer.from(block.version,"ascii").toString();
-
-//      block.version = utils.toAscii(block.version);
+      //      block.version = utils.toAscii(block.version);
       //block.version=new String(block.version);
       if (block.versionSignatures instanceof Array) {
         for (var i = 0; i < block.versionSignatures.length; i++) {
@@ -145,69 +151,47 @@ const overrides = {
           }
         }
       }
-
-            if (block.transactions instanceof Array) {
-              for(var i=0;i<block.transactions.length;i++){
-                if(typeof block.transactions[i] !== 'string')
-                  var tx = block.transactions[i]
-                if(tx.blockNumber !== null)
-                  tx.blockNumber = bigNumbertoDecimal(tx.blockNumber);
-                if(tx.transactionIndex !== null)
-                  tx.transactionIndex = bigNumbertoDecimal(tx.transactionIndex);
-                tx.nonce = bigNumbertoDecimal(tx.nonce);
-                tx.gas = bigNumbertoDecimal(tx.gas);
-                tx.gasPrice = bigNumbertoDecimal(tx.gasPrice);
-                tx.value = bigNumbertoDecimal(tx.value);
-                for(var i = 0; tx.extra_to && i < tx.extra_to.length; i++){
-                  tx.extra_to[i].value = bigNumbertoDecimal(tx.extra_to[i].value);
-                }
-              }
-            }
-
+      if (block.transactions instanceof Array) {
+        for (var i = 0; i < block.transactions.length; i++) {
+          if (typeof block.transactions[i] !== 'string')
+            var tx = block.transactions[i];
+          if (tx.blockNumber !== null)
+            tx.blockNumber = utils.hexToNumber(tx.blockNumber);
+          if (tx.transactionIndex !== null)
+            tx.transactionIndex = utils.hexToNumber(tx.transactionIndex);
+          tx.nonce = utils.hexToNumber(tx.nonce);
+          tx.gas = utils.hexToNumber(tx.gas);
+          tx.gasPrice = utils.hexToNumber(tx.gasPrice);
+          tx.value = utils.hexToNumber(tx.value);
+          for (var i = 0; tx.extra_to && i < tx.extra_to.length; i++) {
+            tx.extra_to[i].value = utils.hexToNumber(tx.extra_to[i].value);
+          }
+        }
+      }
       return block;
     };
   },
-
-  "getTransaction": (web3: Web3Shim) => {
-    const _oldTransactionFormatter =
-      // @ts-ignore
-      web3.eth.getTransaction.method.outputFormatter;
-
+  "getCode": (web3:Web3Shim) => { getcodeInputFormatter(web3); },
+  "getTransaction": (web3:Web3Shim) => {
     // @ts-ignore
     web3.eth.getTransaction.method.outputFormatter = tx => {
-      let result = _oldTransactionFormatter.call(
-        // @ts-ignore
-        web3.eth.getTransaction.method,
-        tx
-      );
-
-      // Perhaps there is a better method of doing this,
-      // but the raw hexstrings work for the time being
-      result.gas = "0x" + new BN(result.gas).toString(16);
-
-      return result;
-    };
-
-  },
-
-  "getTransactionReceipt": (web3: Web3Shim) => {
-    const _oldTransactionReceiptFormatter =
-      // @ts-ignore
-      web3.eth.getTransactionReceipt.method.outputFormatter;
-
-    // @ts-ignore
-    web3.eth.getTransactionReceipt.method.outputFormatter = receipt => {
-      let result = _oldTransactionReceiptFormatter.call(
-        // @ts-ignore
-        web3.eth.getTransactionReceipt.method,
-        receipt
-      );
-
-      // Perhaps there is a better method of doing this,
-      // but the raw hexstrings work for the time being
-      result.gasUsed = "0x" + new BN(result.gasUsed).toString(16);
-
-      return result;
+      if (tx.blockNumber !== null)
+        tx.blockNumber = utils.hexToNumber(tx.blockNumber);
+      if (tx.transactionIndex !== null)
+        tx.transactionIndex = utils.hexToNumber(tx.transactionIndex);
+      tx.nonce = utils.hexToNumber(tx.nonce);
+      tx.gas = utils.hexToNumber(tx.gas);
+      tx.gasPrice = utils.hexToNumber(tx.gasPrice);
+      tx.value = utils.hexToNumber(tx.value);
+      if (tx.to && isAddress(tx.to)) { // tx.to could be `0x0` or `null` while contract creation
+      }
+      else {
+        tx.to = null; // set to `null` if invalid address
+      }
+      for (var i = 0; tx.extra_to && i < tx.extra_to.length; i++) {
+        tx.extra_to[i].value = utils.hexToNumber(tx.extra_to[i].value);
+      }
+      return tx;
     };
   }
 };
