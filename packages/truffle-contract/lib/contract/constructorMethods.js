@@ -1,9 +1,15 @@
-const Web3PromiEvent = require("web3-core-promievent");
 const Web3Shim = require("truffle-interface-adapter").Web3Shim;
 const utils = require("../utils");
 const execute = require("../execute");
 const bootstrap = require("./bootstrap");
-
+var bs58 = require("bs58");
+var getEthAddress = function (address) {
+  if (address.startsWith("0x") || address.startsWith("0X")){
+    return address;
+  }
+  let addrTemp = address.split('.')[1];
+  return '0x' + (bs58.decode(addrTemp.substring(0, addrTemp.length - 1))).toString('hex');
+};
 module.exports = Contract => ({
   setProvider(provider) {
     if (!provider) {
@@ -17,8 +23,6 @@ module.exports = Contract => ({
   },
 
   new() {
-    const promiEvent = new Web3PromiEvent();
-
     utils.checkProvider(this);
 
     if (!this.bytecode || this.bytecode === "0x") {
@@ -31,34 +35,31 @@ module.exports = Contract => ({
       );
     }
 
-    const args = Array.prototype.slice.call(arguments);
+    var constructorABI = this.abi.filter(i => i.type === "constructor")[0];
 
-    // Promievent and flag that allows instance to resolve (rather than just receipt)
-    const context = {
-      contract: this,
-      promiEvent,
-      onlyEmitReceipt: true
-    };
-
-    this.detectNetwork()
-      .then(({ blockLimit }) => {
-        utils.checkLibraries.apply(this);
-        return execute.deploy.call(this, args, context, blockLimit);
-      })
-      .catch(promiEvent.reject);
-
-    return promiEvent.eventEmitter;
+    return execute.deploy.call(this, constructorABI)(...arguments);
   },
 
   async at(address) {
-    if (
-      address == null ||
-      typeof address !== "string" ||
-      address.length !== 42
-    ) {
-      throw new Error(
-        `Invalid address passed to ${this.contractName}.at(): ${address}`
-      );
+    if (this.networkType == "matrix"){
+      if (
+          address == null ||
+          typeof address !== "string"
+      ) {
+        throw new Error(
+            `Invalid address passed to ${this.contractName}.at(): ${address}`
+        );
+      }
+    }else{
+      if (
+          address == null ||
+          typeof address !== "string" ||
+          address.length !== 42
+      ) {
+        throw new Error(
+            `Invalid address passed to ${this.contractName}.at(): ${address}`
+        );
+      }
     }
 
     try {
@@ -197,7 +198,9 @@ module.exports = Contract => ({
         links: {}
       };
     }
-
+  if(this.networkType == "matrix"){
+    address = getEthAddress(address);
+  }
     this.network.links[name] = address;
   },
 

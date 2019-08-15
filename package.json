@@ -25,14 +25,8 @@
       "packages/*"
     ]
   },
-  "dependencies": {
-     "web3-core": "^1.0.0-beta.52",
-    "web3-core-helpers": "^1.0.0-beta.52"
-  },
+  "dependencies": {},
   "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   },
   "lint-staged": {
     "*.js": [

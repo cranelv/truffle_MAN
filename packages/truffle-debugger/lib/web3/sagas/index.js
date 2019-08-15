@@ -165,8 +165,8 @@ export function* init(provider) {
 
 export function* saga() {
   // wait for web3 init signal
-  let { provider } = yield take(actions.INIT_WEB3);
-  let adapter = new Web3Adapter(provider);
+  let { provider,networkType } = yield take(actions.INIT_WEB3);
+  let adapter = new Web3Adapter(provider,networkType);
 
   yield takeEvery(actions.INSPECT, fetchTransactionInfo, adapter);
   yield takeEvery(actions.FETCH_BINARY, fetchBinary, adapter);

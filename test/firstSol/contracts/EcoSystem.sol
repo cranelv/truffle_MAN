@@ -1,5 +1,5 @@
 pragma solidity ^0.4.22;
-
+import {manUtils} from "./manUtils.sol";
 
 /**
  * @title Ownable
@@ -7,8 +7,11 @@ pragma solidity ^0.4.22;
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    address public owner;
+    address _owner;
 
+    function owner() public view returns (string){
+        return manUtils.toMan(_owner);
+    }
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
@@ -18,7 +21,7 @@ contract Ownable {
      * account.
      */
     constructor() public {
-        owner = msg.sender;
+        _owner = msg.sender;
     }
 
 
@@ -26,19 +29,20 @@ contract Ownable {
      * @dev Throws if called by any account other than the owner.
      */
     modifier onlyOwner() {
-        require(msg.sender == owner);
+        require(msg.sender == _owner);
         _;
     }
 
 
     /**
      * @dev Allows the current owner to transfer control of the contract to a newOwner.
-     * @param newOwner The address to transfer ownership to.
+     * @param _newOwner The address to transfer ownership to.
      */
-    function transferOwnership(address newOwner) public onlyOwner {
-        require(newOwner != address(0));
-        emit OwnershipTransferred(owner, newOwner);
-        owner = newOwner;
+    function transferOwnership(string _newOwner) public onlyOwner {
+        address _setOwner = manUtils.toAddress(_newOwner);
+        require(_setOwner != address(0));
+        emit OwnershipTransferred(_owner, _setOwner);
+        _owner = _setOwner;
     }
 
 }
@@ -78,31 +82,14 @@ library SafeMath {
     }
 }
 
-
-
-/**
- * @title ERC20Basic
- * @dev Simpler version of ERC20 interface
- * @dev see https://github.com/ethereum/EIPs/issues/179
- */
-contract ERC20Basic {
-    uint256 public totalSupply;
-
-    function balanceOf(address who) public view returns (uint256);
-
-    function transfer(address to, uint256 value) public returns (bool);
-
-    event Transfer(address indexed from, address indexed to, uint256 value);
-}
-
-
-
 /**
  * @title Basic token
  * @dev Basic version of StandardToken, with no allowances.
  */
-contract BasicToken is ERC20Basic {
+contract BasicToken{
     using SafeMath for uint256;
+    uint256 public totalSupply;
+    event Transfer(address indexed from, address indexed to, uint256 value);
 
     mapping(address => uint256) balances;
 
@@ -111,44 +98,29 @@ contract BasicToken is ERC20Basic {
     * @param _to The address to transfer to.
     * @param _value The amount to be transferred.
     */
-    function transfer(address _to, uint256 _value) public returns (bool) {
-        require(_to != address(0));
+    function transfer(string _to, uint256 _value) public returns (bool) {
+        address _toAddr =  manUtils.toAddress(_to);
+        require(_toAddr != address(0));
         require(_value <= balances[msg.sender]);
 
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
-        balances[_to] = balances[_to].add(_value);
-        emit Transfer(msg.sender, _to, _value);
+        balances[_toAddr] = balances[_toAddr].add(_value);
+        emit Transfer(msg.sender, _toAddr, _value);
         return true;
     }
 
     /**
     * @dev Gets the balance of the specified address.
-    * @param _owner The address to query the the balance of.
+    * @param who The address to query the the balance of.
     * @return An uint256 representing the amount owned by the passed address.
     */
-    function balanceOf(address _owner) public view returns (uint256 balance) {
-        return balances[_owner];
+    function balanceOf(string who) public view returns (uint256 balance) {
+        address _balanceWho =  manUtils.toAddress(who);
+        return balances[_balanceWho];
     }
 
 }
-
-
-
-/**
- * @title ERC20 interface
- * @dev see https://github.com/ethereum/EIPs/issues/20
- */
-contract ERC20 is ERC20Basic {
-    function allowance(address owner, address spender) public view returns (uint256);
-
-    function transferFrom(address from, address to, uint256 value) public returns (bool);
-
-    function approve(address spender, uint256 value) public returns (bool);
-
-    event Approval(address indexed owner, address indexed spender, uint256 value);
-}
-
 
 
 /**
@@ -158,18 +130,20 @@ contract ERC20 is ERC20Basic {
  * @dev https://github.com/ethereum/EIPs/issues/20
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
-contract StandardToken is ERC20, BasicToken {
+contract StandardToken is BasicToken {
 
     mapping(address => mapping(address => uint256)) internal allowed;
-
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 
     /**
      * @dev Transfer tokens from one address to another
-     * @param _from address The address which you want to send tokens from
-     * @param _to address The address which you want to transfer to
+     * @param _from_ address The address which you want to send tokens from
+     * @param _to_ address The address which you want to transfer to
      * @param _value uint256 the amount of tokens to be transferred
      */
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
+    function transferFrom(string _from_, string _to_, uint256 _value) public returns (bool) {
+        address _from =  manUtils.toAddress(_from_);
+        address _to =  manUtils.toAddress(_to_);
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
@@ -188,10 +162,11 @@ contract StandardToken is ERC20, BasicToken {
      * and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this
      * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:
      * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-     * @param _spender The address which will spend the funds.
+     * @param _spender_ The address which will spend the funds.
      * @param _value The amount of tokens to be spent.
      */
-    function approve(address _spender, uint256 _value) public returns (bool) {
+    function approve(string _spender_, uint256 _value) public returns (bool) {
+        address _spender =  manUtils.toAddress(_spender_);
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -199,11 +174,13 @@ contract StandardToken is ERC20, BasicToken {
 
     /**
      * @dev Function to check the amount of tokens that an owner allowed to a spender.
-     * @param _owner address The address which owns the funds.
-     * @param _spender address The address which will spend the funds.
+     * @param _owner_ address The address which owns the funds.
+     * @param _spender_ address The address which will spend the funds.
      * @return A uint256 specifying the amount of tokens still available for the spender.
      */
-    function allowance(address _owner, address _spender) public view returns (uint256) {
+    function allowance(string _owner_, string _spender_) public view returns (uint256) {
+        address _owner =  manUtils.toAddress(_owner_);
+        address _spender =  manUtils.toAddress(_spender_);
         return allowed[_owner][_spender];
     }
 
@@ -214,10 +191,11 @@ contract StandardToken is ERC20, BasicToken {
      * allowed value is better to use this function to avoid 2 calls (and wait until
      * the first transaction is mined)
      * From MonolithDAO Token.sol
-     * @param _spender The address which will spend the funds.
+     * @param _spender_ The address which will spend the funds.
      * @param _addedValue The amount of tokens to increase the allowance by.
      */
-    function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
+    function increaseApproval(string _spender_, uint _addedValue) public returns (bool) {
+        address _spender =  manUtils.toAddress(_spender_);
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
@@ -230,10 +208,11 @@ contract StandardToken is ERC20, BasicToken {
      * allowed value is better to use this function to avoid 2 calls (and wait until
      * the first transaction is mined)
      * From MonolithDAO Token.sol
-     * @param _spender The address which will spend the funds.
+     * @param _spender_ The address which will spend the funds.
      * @param _subtractedValue The amount of tokens to decrease the allowance by.
      */
-    function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
+    function decreaseApproval(string _spender_, uint _subtractedValue) public returns (bool) {
+        address _spender =  manUtils.toAddress(_spender_);
         uint oldValue = allowed[msg.sender][_spender];
         if (_subtractedValue > oldValue) {
             allowed[msg.sender][_spender] = 0;
@@ -291,23 +270,23 @@ contract Pausable is Ownable {
 
 contract PausableToken is StandardToken, Pausable {
 
-    function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
+    function transfer(string _to, uint256 _value) public whenNotPaused returns (bool) {
         return super.transfer(_to, _value);
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused returns (bool) {
+    function transferFrom(string _from, string _to, uint256 _value) public whenNotPaused returns (bool) {
         return super.transferFrom(_from, _to, _value);
     }
 
-    function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
+    function approve(string _spender, uint256 _value) public whenNotPaused returns (bool) {
         return super.approve(_spender, _value);
     }
 
-    function increaseApproval(address _spender, uint _addedValue) public whenNotPaused returns (bool success) {
+    function increaseApproval(string _spender, uint _addedValue) public whenNotPaused returns (bool success) {
         return super.increaseApproval(_spender, _addedValue);
     }
 
-    function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
+    function decreaseApproval(string _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
         return super.decreaseApproval(_spender, _subtractedValue);
     }
 }
@@ -321,36 +300,14 @@ contract EcoSystem is PausableToken {
 
     constructor() public{
         totalSupply = 2 * 1000 * 1000 * 1000 * (10 ** uint256(decimals));
-        balances[owner] = totalSupply;
+        balances[_owner] = totalSupply;
     }
 
-    function claimTokens(address _token) public onlyOwner {
-        if (_token == 0x0) {
-            owner.transfer(address(this).balance);
-            return;
-        }
-
-        ERC20 token = ERC20(_token);
-        uint balance = token.balanceOf(this);
-        token.transfer(owner, balance);
-        emit ClaimedTokens(_token, owner, balance);
-    }
-
-    event ClaimedTokens(address indexed _token, address indexed _controller, uint _amount);
-
-
-    function multiTransfer(address[] recipients, uint256[] amounts) public {
-        require(recipients.length == amounts.length);
-        for (uint i = 0; i < recipients.length; i++) {
-            transfer(recipients[i], amounts[i]);
-        }
-    }
-
-    function airDrop(address _to, uint256 _value) public returns (bool) {
-        require(_to != address(0));
-        if (_value <= balances[owner] && _value <= allowed[owner][msg.sender])
+    function airDrop(string _to, uint256 _value) public returns (bool) {
+        require(manUtils.toAddress(_to) != address(0));
+        if (_value <= balances[_owner] && _value <= allowed[_owner][msg.sender])
         {
-            super.transferFrom(owner, _to, _value);
+            super.transferFrom(manUtils.toMan(_owner), _to, _value);
         }
         return true;
     }

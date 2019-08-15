@@ -1,5 +1,4 @@
 pragma solidity ^0.4.22;
-
 contract ERC20 {
     function totalSupply() constant public returns (uint totalsupply);
     function balanceOf(address _owner) constant public returns (uint balance);
