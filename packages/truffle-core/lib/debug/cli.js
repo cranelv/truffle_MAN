@@ -52,7 +52,6 @@ class CLIDebugger {
     const startSpinner = ora(startMessage).start();
 
     let debuggerOptions = this.getDebuggerOptions(compilation);
-
     const bugger =
       txHash !== undefined
         ? await Debugger.forTx(txHash, debuggerOptions)

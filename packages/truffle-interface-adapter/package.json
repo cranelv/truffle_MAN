@@ -25,7 +25,8 @@
     "lodash": "^4.17.13",
     "web3": "1.2.1",
     "web3-utils": "1.2.1",
-    "web3-core-method": "1.2.1"
+    "web3-core-method": "1.2.1",
+    "web3-core-promievent": "1.2.1"
   },
   "devDependencies": {
     "@types/bn.js": "^4.11.4",

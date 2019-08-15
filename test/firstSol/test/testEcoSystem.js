@@ -23,3 +23,6 @@ contract('EcoSystem', function() {
 });
 //let instance = await EcoSystem.deployed()
 //let tx = await instance.transfer("MAN.5ZUUYf8QQcPizuqCQMVQam5zmJZj",100000000000,{from:"MAN.2AmKUD6p9DjvcBzUADMhbVHQfewWz",gas: 1000000})
+
+//let instance = await MBCToken.deployed()
+//let tx = await instance.transfer("0x05a4a6ac92c9e40d98e7bcf7eed2c364eb61fc92",100000000000,{from:"MAN.2AmKUD6p9DjvcBzUADMhbVHQfewWz",gas: 1000000})

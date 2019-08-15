@@ -159,8 +159,8 @@ function* receiveBinary(address) {
   return binary;
 }
 
-export function* init(provider) {
-  yield put(actions.init(provider));
+export function* init(provider,networkType) {
+  yield put(actions.init(provider,networkType));
 }
 
 export function* saga() {
