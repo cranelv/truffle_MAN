@@ -1,3 +1,9 @@
+yarn.lock
+package-lock.json
+docs
+dist
+tmp-*
+.idea/
 lerna-debug.log
 packages/**/node_modules
 node_modules
@@ -18,4 +24,3 @@ packages/truffle-debugger/.tmp
 
 # truffle-contract
 packages/truffle-contract/dist
-.idea/
