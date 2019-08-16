@@ -230,7 +230,7 @@ const command = {
     }
 
     async function runMigrations(config) {
-      Migrate.launchReporter();
+      Migrate.launchReporter(config.networks[config.network].type);
 
       if (options.f) {
         await Migrate.runFrom(options.f, config);

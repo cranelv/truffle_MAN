@@ -1,9 +1,27 @@
 /**
  *  A module that formats output for the Migrations reporter.
  */
+let defaultUnits = {
+  wei: "wei",
+  gwei: "gwei",
+  eth : "ETH"
+}
+function getUnits(networkType) {
+  switch (networkType) {
+    case "matrix" :
+      return {
+        wei: "wei",
+        gwei: "gwei",
+        eth : "MAN"
+      };
+    default:
+      return defaultUnits;
+  }
+}
 class MigrationsMessages {
-  constructor(reporter) {
+  constructor(reporter,networkType) {
     this.reporter = reporter;
+    this.units = getUnits(networkType);
   }
 
   // ----------------------------------- Utilities -------------------------------------------------
@@ -131,7 +149,7 @@ class MigrationsMessages {
           data.contract.contractName
         }" could not deploy due to insufficient funds\n` +
         `   * Account:  ${data.from}\n` +
-        `   * Balance:  ${data.balance} wei\n` +
+        `   * Balance:  ${data.balance} ${this.units.wei}\n` +
         `   * Message:  ${data.error.message}\n` +
         `   * Try:\n` +
         `      + Using an adequately funded account\n` +
@@ -221,9 +239,9 @@ class MigrationsMessages {
           `   > ${"account:".padEnd(20)} ${data.from}\n` +
           `   > ${"balance:".padEnd(20)} ${data.balance}\n` +
           `   > ${"gas used:".padEnd(20)} ${data.gas}\n` +
-          `   > ${"gas price:".padEnd(20)} ${data.gasPrice} gwei\n` +
-          `   > ${"value sent:".padEnd(20)} ${data.value} ETH\n` +
-          `   > ${"total cost:".padEnd(20)} ${data.cost} ETH\n`;
+          `   > ${"gas price:".padEnd(20)} ${data.gasPrice} ${this.units.gwei}\n` +
+          `   > ${"value sent:".padEnd(20)} ${data.value} ${this.units.eth}\n` +
+          `   > ${"total cost:".padEnd(20)} ${data.cost} ${this.units.eth}\n`;
 
         if (reporter.confirmations !== 0)
           output += self.underline(
@@ -296,7 +314,7 @@ class MigrationsMessages {
         output +=
           self.underline(37) +
           "\n" +
-          `   > ${"Total cost:".padEnd(15)} ${data.cost.padStart(15)} ETH\n`;
+          `   > ${"Total cost:".padEnd(15)} ${data.cost.padStart(15)} ${this.units.eth}\n`;
 
         return output;
       },
@@ -305,7 +323,7 @@ class MigrationsMessages {
         self.doubleline("Summary") +
         "\n" +
         `> ${"Total deployments:".padEnd(20)} ${data.totalDeployments}\n` +
-        `> ${"Final cost:".padEnd(20)} ${data.finalCost} ETH\n`,
+        `> ${"Final cost:".padEnd(20)} ${data.finalCost} ${this.units.eth}\n`,
 
       // Batch
       many: () => self.underline(`Deploying Batch`),

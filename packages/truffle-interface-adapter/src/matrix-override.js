@@ -458,7 +458,6 @@ export function confirmTransaction(defer, result, payload) {
               }
               canUnsubscribe = false;
               confirmationCount++;
-              console.log("confirmationCount", confirmationCount);
               if (confirmationCount === CONFIRMATIONBLOCKS + 1) { // add 1 so we account for conf 0
                 sub.unsubscribe();
                 defer.eventEmitter.removeAllListeners();

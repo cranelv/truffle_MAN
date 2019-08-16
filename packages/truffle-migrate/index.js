@@ -15,8 +15,8 @@ const Migrate = {
   Migration: Migration,
   reporter: null,
 
-  launchReporter: function() {
-    Migrate.reporter = new Reporter();
+  launchReporter: function(networkType) {
+    Migrate.reporter = new Reporter(networkType);
   },
 
   acceptDryRun: async function() {

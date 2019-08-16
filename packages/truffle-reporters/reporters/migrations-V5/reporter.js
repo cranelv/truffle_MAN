@@ -22,7 +22,7 @@ const MigrationsMessages = require("./messages");
  *  + `this.deployer`
  */
 class Reporter {
-  constructor() {
+  constructor(networkType) {
     this.deployer = null;
     this.migration = null;
     this.currentGasTotal = new web3Utils.BN(0);
@@ -35,7 +35,7 @@ class Reporter {
     this.blockSpinner = null;
     this.currentBlockWait = "";
 
-    this.messages = new MigrationsMessages(this);
+    this.messages = new MigrationsMessages(this,networkType);
   }
 
   // ------------------------------------  Utilities -----------------------------------------------
