@@ -6,6 +6,8 @@ tmp-*
 .idea/
 lerna-debug.log
 packages/**/node_modules
+packages/**/build
+packages/**/dist
 node_modules
 yarn-error.log
 .vscode
