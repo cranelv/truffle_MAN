@@ -26,7 +26,7 @@ const tag = args[1];
 const premajor = "premajor";
 const prerelease = "prerelease";
 const opts = { stdio: [0, 1, 2] };
-
+/*
 // Validate args
 if (!branch || !tag) {
   const help =
@@ -43,7 +43,7 @@ if (!branch || !tag) {
 // Checkout branch
 exec(`git checkout ${branch}`, opts);
 console.log();
-
+*/
 // Read package
 let pkg = fs.readFileSync("./package.json");
 pkg = JSON.parse(pkg);

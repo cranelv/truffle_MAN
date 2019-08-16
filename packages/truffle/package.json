@@ -1,9 +1,9 @@
 {
-  "name": "truffle",
-  "description": "Truffle - Simple development framework for Ethereum",
+  "name": "truffle_man",
+  "description": "Truffle - Simple development framework for Matrix AI Network",
   "author": "consensys.net",
-  "homepage": "https://github.com/trufflesuite/truffle/",
-  "repository": "https://github.com/trufflesuite/truffle/tree/master/packages/truffle",
+  "homepage": "https://github.com/cranelv/truffle_MAN/",
+  "repository": "https://github.com/cranelv/truffle_MAN/tree/master/packages/truffle",
   "bugs": {
     "url": "https://github.com/trufflesuite/truffle/issues"
   },
@@ -62,7 +62,7 @@
   },
   "authors": [
     {
-      "name": "Tim Coulter",
+      "name": "Tim Coulter,cranelv",
       "email": "tim@timothyjcoulter.com",
       "url": "https://github.com/tcoulter"
     }
