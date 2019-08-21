@@ -4,7 +4,7 @@ const bigNumberify = require("ethers/utils/bignumber").bigNumberify;
 const abi = require("web3-eth-abi");
 const BlockchainUtils = require("truffle-blockchain-utils");
 const reformat = require("./reformat");
-
+const reformatMan = require("./reformatMatrix");
 const Utils = {
   is_object(val) {
     return typeof val === "object" && !Array.isArray(val);
@@ -38,7 +38,7 @@ const Utils = {
     return false;
   },
 
-  decodeLogs(_logs, isSingle) {
+  decodeLogs(_logs,networkType, isSingle) {
     const constructor = this;
     const logs = Utils.toTruffleLog(_logs, isSingle);
 
@@ -61,6 +61,9 @@ const Utils = {
 
         const logArgs = abi.decodeLog(logABI.inputs, copy.data, copy.topics);
         copy.args = reformat.numbers.call(constructor, logArgs, logABI.inputs);
+        if (networkType == "matrix"){
+          copy.args = reformatMan.manAddress.call(constructor, copy.args, logABI.inputs);
+        }
 
         delete copy.data;
         delete copy.topics;

@@ -21698,14 +21698,14 @@
     "1": {
       "events": {},
       "links": {
-        "manUtils": "0xb30d6596291006149d09a93ebfba2fdd2e1ccef0"
+        "manUtils": "0xff17dd8b38a701d3af926927b9466bfa7a959cc9"
       },
-      "address": "MAN.3ZuesqJXVy1mdA5d9ZYVKzf4LTJK4",
-      "transactionHash": "0x78a20966dc15a6cf8b39d82c9dc4a0f5cb5c9184500e8b931750a729f6348c6b"
+      "address": "MAN.24NvfE4zkwieKCPTRQJ76hDefXvaA",
+      "transactionHash": "0x0c0b7418748e2b51755c094a1165f8bd4cdcb7144577512f315365d730b6ef88"
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-08-16T02:41:13.918Z",
+  "updatedAt": "2019-08-21T05:57:46.923Z",
   "devdoc": {
     "methods": {
       "allowance(string,string)": {

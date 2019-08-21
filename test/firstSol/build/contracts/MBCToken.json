@@ -19194,12 +19194,12 @@
     "1": {
       "events": {},
       "links": {},
-      "address": "MAN.4Z8F82XtPykvP36uU6XKhoefhZJpF",
-      "transactionHash": "0x4577f4e4cb8237330744ea6acc366aec81258fa5e3ea6fc7e296eb8a8f9b996f"
+      "address": "MAN.2tSn95Uu4tbyKTs9ZFpPm6VNadH2u",
+      "transactionHash": "0x55f67a16f2ed5c72c960ff43cfc1295985715978f8f97cd2b487d14269c666f8"
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-08-16T02:41:26.443Z",
+  "updatedAt": "2019-08-21T05:58:11.521Z",
   "devdoc": {
     "methods": {
       "allowance(address,address)": {

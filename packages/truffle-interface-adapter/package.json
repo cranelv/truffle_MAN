@@ -18,15 +18,16 @@
     "test": "mocha --exit -r ts-node/register test/**/*.test.ts"
   },
   "dependencies": {
-    "aiman": "file:../../backup/npm/aiman",
-    "matrix-contract": "file:../../backup/npm/matrix-contract",
+    "aiman": "0.0.15",
+    "matrix-contract": "1.2.1",
     "bn.js": "^4.11.8",
     "ethers": "^4.0.32",
     "lodash": "^4.17.13",
     "web3": "1.2.1",
     "web3-utils": "1.2.1",
     "web3-core-method": "1.2.1",
-    "web3-core-promievent": "1.2.1"
+    "web3-core-promievent": "1.2.1",
+    "matrix_utils": "^1.0.0"
   },
   "devDependencies": {
     "@types/bn.js": "^4.11.4",

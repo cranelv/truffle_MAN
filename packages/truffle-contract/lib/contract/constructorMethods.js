@@ -2,14 +2,8 @@ const Web3Shim = require("truffle-interface-adapter").Web3Shim;
 const utils = require("../utils");
 const execute = require("../execute");
 const bootstrap = require("./bootstrap");
-var bs58 = require("bs58");
-var getEthAddress = function (address) {
-  if (address.startsWith("0x") || address.startsWith("0X")){
-    return address;
-  }
-  let addrTemp = address.split('.')[1];
-  return '0x' + (bs58.decode(addrTemp.substring(0, addrTemp.length - 1))).toString('hex');
-};
+var manUtils = require("matrix_utils");
+
 module.exports = Contract => ({
   setProvider(provider) {
     if (!provider) {
@@ -199,7 +193,7 @@ module.exports = Contract => ({
       };
     }
   if(this.networkType == "matrix"){
-    address = getEthAddress(address);
+    address = manUtils.toEthAddress(address);
   }
     this.network.links[name] = address;
   },

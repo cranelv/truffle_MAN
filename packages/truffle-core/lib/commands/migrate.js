@@ -182,7 +182,6 @@ const command = {
           dryRunOnly,
           dryRunAndMigrations
         } = command.determineDryRunSettings(conf, options);
-
         if (dryRunOnly) {
           conf.dryRun = true;
           await setupDryRunEnvironmentThenRunMigrations(conf);

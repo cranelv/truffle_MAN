@@ -52,7 +52,7 @@ module.exports = {
       port: 8341, // Standard Ethereum port (default: none)
       network_id: 1, // Any network (default: none)
       type: "matrix",
-      dryRun: false,
+//      dryRun: false,
       skipDryRun: true,
       provider: ipcProvider,
       from: "MAN.2AmKUD6p9DjvcBzUADMhbVHQfewWz"

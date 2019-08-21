@@ -91,11 +91,10 @@ var handlers = {
     // stopgap until we can get the ABI for all events, not just the current
     // contract
     receipt.rawLogs = receipt.logs;
-
     // Decode logs, use as receipt.logs for ease of use.
     try {
       receipt.logs = receipt.logs
-        ? Utils.decodeLogs.call(context.contract, receipt.logs)
+        ? Utils.decodeLogs.call(context.contract, receipt.logs, context.contract.web3.networkType)
         : [];
     } catch (error) {
       return context.promiEvent.reject(error);

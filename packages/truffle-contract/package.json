@@ -20,7 +20,6 @@
   },
   "dependencies": {
     "bignumber.js": "^7.2.1",
-    "bs58": "^4.0.1",
     "ethers": "^4.0.0-beta.1",
     "truffle-blockchain-utils": "^0.0.10",
     "truffle-contract-schema": "^3.0.11",
@@ -29,7 +28,8 @@
     "web3": "1.2.1",
     "web3-core-promievent": "1.2.1",
     "web3-eth-abi": "1.2.1",
-    "web3-utils": "1.2.1"
+    "web3-utils": "1.2.1",
+    "matrix_utils": "^1.0.0"
   },
   "devDependencies": {
     "async": "2.6.1",

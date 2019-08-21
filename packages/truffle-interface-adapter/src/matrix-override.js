@@ -4,9 +4,7 @@ var utils = require('web3-utils');
 var formatters = require('web3-core-helpers').formatters;
 var promiEvent = require('web3-core-promievent');
 var Subscriptions = require('web3-core-subscriptions').subscriptions;
-var bs58 = require("bs58");
-const Buffer = require('safe-buffer').Buffer;
-var polycrc = require('polycrc');
+var manUtils = require("matrix_utils");
 var matrixContract = require("matrix-contract");
 var CONFIRMATIONBLOCKS = 3;
 var TIMEOUTBLOCK = 10;
@@ -42,7 +40,7 @@ export function InputAddressFormatter(address) {
     return address;
   }
   else {
-    return genManAddress(address);
+    return manUtils.toManAddress(address);
   }
   throw new Error('invalid address');
 };
@@ -307,24 +305,7 @@ var outputLogFormatter = function (log) {
     log.logIndex = utils.hexToNumber(log.logIndex);
   return log;
 };
-var getEthAddress = function (address) {
-  let addrTemp = address.split('.')[1];
-  return '0x' + (bs58.decode(addrTemp.substring(0, addrTemp.length - 1))).toString('hex');
-};
-var genManAddress = function (address) {
-  var prefix = address.substring(0, 2);
-  if (prefix === '0x' || prefix === '0X') {
-    address = address.substring(2);
-  }
-  let crc8 = polycrc.crc(8, 0x07, 0x00, 0x00, false);
-  const bytes = Buffer.from(address, 'hex');
-  const manAddress = bs58.encode(bytes);
-  let arr = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P',
-    'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-    'j', 'k', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-  ];
-  return ('MAN.' + manAddress) + arr[crc8('MAN.' + manAddress) % 58];
-};
+
 /**
  * Formats the output of a transaction receipt to its proper values
  *
@@ -348,10 +329,7 @@ export function outputTransactionReceiptFormatter(receipt) {
   if (typeof receipt.status !== 'undefined') {
     receipt.status = Boolean(parseInt(receipt.status));
   }
-  //  if (receipt.contractAddress){
-  //    receipt.contractAddress = getEthAddress(receipt.contractAddress);
-  //  }
-  return receipt;
+   return receipt;
 };
 /**
  * Formats the output of a block to its proper values
