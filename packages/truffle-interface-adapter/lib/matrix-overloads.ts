@@ -4,7 +4,7 @@ import { ContractNewOptions,balanceOutputFormatter,getcodeInputFormatter,InputAd
 
 export const MatrixDefinition = {
   async initNetworkType (web3: Web3Shim) {
-    console.log("Welcome to Matrix AI Network");
+//    console.log("Welcome to Matrix AI Network");
     for (let key in overrides) {
       if (overrides.hasOwnProperty(key)) {
         overrides[key](web3);
@@ -52,6 +52,9 @@ const overrides: { [x: string]: (arg0: Web3Shim) => void } = {
       // @ts-ignore
       // Perhaps there is a better method of doing this,
       // but the raw hexstrings work for the time being
+        if (typeof accounts === 'string' ||
+            (accounts && accounts.constructor && accounts.constructor.name === 'String'))
+            return accounts;
       return accounts[0];
     };
   },

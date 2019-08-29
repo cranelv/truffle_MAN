@@ -30148,11 +30148,11 @@
       "events": {},
       "links": {},
       "address": "MAN.4Z8F82XtPykvP36uU6XKhoefhZJpF",
-      "transactionHash": "0x003566e87cef7f35d538659d555549a5ef9d0933375e3c513b32f0a54cc927de"
+      "transactionHash": "0x0cc5fe0d2e7eab8b09a5941bf07641318790c8a08f2b34d2fc30cb5485d444ef"
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-08-21T05:57:47.020Z",
+  "updatedAt": "2019-08-29T04:43:40.952Z",
   "devdoc": {
     "methods": {}
   },

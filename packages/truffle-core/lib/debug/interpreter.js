@@ -13,7 +13,7 @@ const analytics = require("../services/analytics");
 const ReplManager = require("../repl");
 
 const { DebugPrinter } = require("./printer");
-
+const { MatrixPrinter } = require("./printer_man");
 function watchExpressionAnalytics(raw) {
   if (raw.includes("!<")) {
     //don't send analytics for watch expressions involving selectors
@@ -28,12 +28,19 @@ function watchExpressionAnalytics(raw) {
     args: { isVariable }
   });
 }
-
+function newDebugPrinter(config, session) {
+  let networkType = config.networks[config.network].type;
+  if (networkType == "matrix"){
+    return new MatrixPrinter(config,session);
+  }else{
+    return new DebugPrinter(config, session);
+  }
+}
 class DebugInterpreter {
   constructor(config, session, txHash) {
     this.session = session;
     this.network = config.network;
-    this.printer = new DebugPrinter(config, session);
+    this.printer = newDebugPrinter(config, session)
     this.txHash = txHash;
     this.lastCommand = "n";
 

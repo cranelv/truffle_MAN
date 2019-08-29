@@ -155,7 +155,6 @@ function* receiveBinary(address) {
     action => action.type == actions.RECEIVE_BINARY && action.address == address
   );
   debug("got binary for %s", address);
-
   return binary;
 }
 

@@ -4,7 +4,6 @@ const debug = debugModule("debugger:session:sagas");
 import { call, all, fork, take, put, race } from "redux-saga/effects";
 
 import { prefixName } from "lib/helpers";
-
 import * as ast from "lib/ast/sagas";
 import * as controller from "lib/controller/sagas";
 import * as solidity from "lib/solidity/sagas";
@@ -113,6 +112,7 @@ function* fetchTx(txHash) {
   debug("processing trace for addresses");
   let addresses = yield* trace.processTrace(result.trace);
   //add in the address of the call itself (if a call)
+
   if (result.address && !addresses.includes(result.address)) {
     addresses.push(result.address);
   }
@@ -124,11 +124,9 @@ function* fetchTx(txHash) {
   ) {
     addresses.push(result.storageAddress);
   }
-
   let blockNumber = result.block.number.toString(); //a BN is not accepted
   debug("obtaining binaries");
   let binaries = yield* web3.obtainBinaries(addresses, blockNumber);
-
   debug("recording instances");
   yield all(
     addresses.map((address, i) => call(recordInstance, address, binaries[i]))

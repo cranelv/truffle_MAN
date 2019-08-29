@@ -24,33 +24,32 @@ const session = createSelectorTree({
       [evm.current.codex.instances, evm.info.contexts, solidity.info.sources],
 
       (instances, contexts, sources) =>
-        Object.assign(
+      Object.assign(
           {},
           ...Object.entries(instances).map(
-            ([address, { context: contextId, binary }]) => {
-              debug("instances %O", instances);
-              debug("contexts %O", contexts);
-              let context = contexts[contextId];
-              if (!context) {
-                return { [address]: { binary } };
+              ([address, {context: contextId, binary}]) => {
+                  debug("instances %O", instances);
+                  debug("contexts %O", contexts);
+                  let context = contexts[contextId];
+                  if (!context) {
+                      return {[address]: {binary}};
+                  }
+                  let {contractName, primarySource} = context;
+
+                  let source =
+                      primarySource !== undefined
+                          ? sources[primarySource]
+                          : undefined;
+                  return {
+                      [address]: {
+                          contractName,
+                          source,
+                          binary
+                      }
+                  };
               }
-              let { contractName, primarySource } = context;
-
-              let source =
-                primarySource !== undefined
-                  ? sources[primarySource]
-                  : undefined;
-
-              return {
-                [address]: {
-                  contractName,
-                  source,
-                  binary
-                }
-              };
-            }
           )
-        )
+      )
     )
   },
 

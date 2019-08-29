@@ -19195,11 +19195,11 @@
       "events": {},
       "links": {},
       "address": "MAN.2tSn95Uu4tbyKTs9ZFpPm6VNadH2u",
-      "transactionHash": "0x55f67a16f2ed5c72c960ff43cfc1295985715978f8f97cd2b487d14269c666f8"
+      "transactionHash": "0xf6c80729a7756751b9d13418938d7ebd2aa5a52bd9108f1fa28b96a60328b5f9"
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-08-21T05:58:11.521Z",
+  "updatedAt": "2019-08-29T04:44:15.440Z",
   "devdoc": {
     "methods": {
       "allowance(address,address)": {

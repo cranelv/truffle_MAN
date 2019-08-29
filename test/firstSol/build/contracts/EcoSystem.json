@@ -21701,11 +21701,11 @@
         "manUtils": "0xff17dd8b38a701d3af926927b9466bfa7a959cc9"
       },
       "address": "MAN.24NvfE4zkwieKCPTRQJ76hDefXvaA",
-      "transactionHash": "0x0c0b7418748e2b51755c094a1165f8bd4cdcb7144577512f315365d730b6ef88"
+      "transactionHash": "0x80b6de9afb0c3ebc5ffda0c598b5e0fdcbc4de58f417b60cc948faee73305d40"
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-08-21T05:57:46.923Z",
+  "updatedAt": "2019-08-29T04:43:40.933Z",
   "devdoc": {
     "methods": {
       "allowance(string,string)": {

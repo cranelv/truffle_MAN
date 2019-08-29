@@ -82,7 +82,6 @@ export function* processTrace(steps) {
         )
     )
   ];
-
   return addresses;
 }
 

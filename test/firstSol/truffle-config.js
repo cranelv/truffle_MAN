@@ -18,17 +18,24 @@
  *
  */
 
-// const HDWalletProvider = require('truffle-hdwallet-provider');
+ const MANHDWalletProvider = require('truffle-manhdwallet-provider');
 // const infuraKey = "fj4jll3k.....";
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
+    //a5c702f168cfdd962d384435f0036932cef3e5a5ce761c8e103fbb7e2296c7cb
+/*
 const Web3 = require("web3");
 let net = require("net");
 let ipcProvider = new Web3.providers.IpcProvider(
   "/home/cranelv/work/src/github.com/MatrixAINetwork/go-matrix/Jerry/datav/data/gman.ipc",
   net
 );
+let httpProvider = new Web3.providers.HttpProvider("http://127.0.0.1:8567");
+
+
+ */
+
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -49,13 +56,14 @@ module.exports = {
     //
     development: {
       host: "127.0.0.1", // Localhost (default: none)
-      port: 8341, // Standard Ethereum port (default: none)
+      port: 8567, // Standard Ethereum port (default: none)
       network_id: 1, // Any network (default: none)
       type: "matrix",
 //      dryRun: false,
       skipDryRun: true,
-      provider: ipcProvider,
-      from: "MAN.2AmKUD6p9DjvcBzUADMhbVHQfewWz"
+      gasPrice: 18000000000,
+      provider: () => new MANHDWalletProvider(1,"0xa5c702f168cfdd962d384435f0036932cef3e5a5ce761c8e103fbb7e2296c7cb","http://127.0.0.1:8567"),
+//      from: "MAN.2AmKUD6p9DjvcBzUADMhbVHQfewWz"
     }
 
     // Another network with more advanced options...

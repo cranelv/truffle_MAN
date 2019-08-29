@@ -20,5 +20,6 @@ module.exports = {
   test: require("./test"),
   unbox: require("./unbox"),
   version: require("./version"),
-  watch: require("./watch")
+  watch: require("./watch"),
+  matrix: require("./matrix")
 };
