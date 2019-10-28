@@ -10,7 +10,109 @@ var path = require("path");
 var _ = require("lodash");
 var async = require("async");
 var fs = require("fs");
+var manUtils = require("matrix_utils");
+function getLogsOutputPrinter(networkType) {
+  switch (networkType) {
+    case "matrix":
+      return function OutputPrinter(self,logs) {
+        let manLogs = [];
+        if (logs && logs.length > 0) {
+          for(var i=0;i<logs.length;i++){
+            if(logs[i].CoinType == "MAN"){
+              if (logs[i].Logs && logs[i].Logs.length > 0){
+                manLogs.push(...logs[i].Logs);
+              }
+            }
+          }
+        }
+        if (manLogs.length === 0) {
+          self.logger.log("    > No events were emitted");
+          return;
+        }
 
+        self.logger.log("\n    Events emitted during test:");
+        self.logger.log("    ---------------------------");
+        self.logger.log("");
+
+        manLogs.forEach(function(log) {
+          var event = self.known_events[log.topics[0]];
+
+          if (event == null) {
+            return; // do not log anonymous events
+          }
+
+          var types = event.abi_entry.inputs.map(function(input) {
+            return input.type;
+          });
+
+          var values = abi.decodeLog(
+              event.abi_entry.inputs,
+              log.data,
+              log.topics.slice(1) // skip topic[0] for non-anonymous event
+          );
+
+          var eventName = event.abi_entry.name;
+          var eventArgs = event.abi_entry.inputs
+              .map(function(input, index) {
+                var prefix = input.indexed === true ? "<indexed> " : "";
+                if (types[index] == "address"){
+                  var address = manUtils.toManAddress(values[index]);
+                  var value = `${address} (${types[index]})`;
+                  return `${input.name}: ${prefix}${value}`;
+                }else{
+                  var value = `${values[index]} (${types[index]})`;
+                  return `${input.name}: ${prefix}${value}`;
+                }
+              })
+              .join(", ");
+
+          self.logger.log(`    ${eventName}(${eventArgs})`);
+        });
+        self.logger.log("\n    ---------------------------");
+       };
+    default:
+      return function OutputPrinter(self,logs) {
+        if (logs.length === 0) {
+          self.logger.log("    > No events were emitted");
+          return;
+        }
+
+        self.logger.log("\n    Events emitted during test:");
+        self.logger.log("    ---------------------------");
+        self.logger.log("");
+
+        logs.forEach(function(log) {
+          var event = self.known_events[log.topics[0]];
+
+          if (event == null) {
+            return; // do not log anonymous events
+          }
+
+          var types = event.abi_entry.inputs.map(function(input) {
+            return input.type;
+          });
+
+          var values = abi.decodeLog(
+              event.abi_entry.inputs,
+              log.data,
+              log.topics.slice(1) // skip topic[0] for non-anonymous event
+          );
+
+          var eventName = event.abi_entry.name;
+          var eventArgs = event.abi_entry.inputs
+              .map(function(input, index) {
+                var prefix = input.indexed === true ? "<indexed> " : "";
+                var value = `${values[index]} (${types[index]})`;
+                return `${input.name}: ${prefix}${value}`;
+              })
+              .join(", ");
+
+          self.logger.log(`    ${eventName}(${eventArgs})`);
+        });
+        self.logger.log("\n    ---------------------------");
+      };
+  }
+}
 function TestRunner(options = {}) {
   expect.options(options, [
     "resolver",
@@ -32,7 +134,7 @@ function TestRunner(options = {}) {
     provider: options.provider,
     networkType: options.networks[options.network].type
   });
-
+  this.getLogsOutputPrinter = getLogsOutputPrinter(options.networks[options.network].type);
   // For each test
   this.currentTestStartBlock = null;
 
@@ -162,7 +264,6 @@ TestRunner.prototype.endTest = function(mocha, callback) {
   if (mocha.currentTest.state !== "failed" && !self.config["show-events"]) {
     return callback();
   }
-
   // There's no API for eth_getLogs?
   this.rpc(
     "eth_getLogs",
@@ -175,45 +276,9 @@ TestRunner.prototype.endTest = function(mocha, callback) {
       if (err) return callback(err);
 
       var logs = result.result;
-
-      if (logs.length === 0) {
-        self.logger.log("    > No events were emitted");
-        return callback();
+      if (self.getLogsOutputPrinter){
+        self.getLogsOutputPrinter(self,logs);
       }
-
-      self.logger.log("\n    Events emitted during test:");
-      self.logger.log("    ---------------------------");
-      self.logger.log("");
-
-      logs.forEach(function(log) {
-        var event = self.known_events[log.topics[0]];
-
-        if (event == null) {
-          return; // do not log anonymous events
-        }
-
-        var types = event.abi_entry.inputs.map(function(input) {
-          return input.type;
-        });
-
-        var values = abi.decodeLog(
-          event.abi_entry.inputs,
-          log.data,
-          log.topics.slice(1) // skip topic[0] for non-anonymous event
-        );
-
-        var eventName = event.abi_entry.name;
-        var eventArgs = event.abi_entry.inputs
-          .map(function(input, index) {
-            var prefix = input.indexed === true ? "<indexed> " : "";
-            var value = `${values[index]} (${types[index]})`;
-            return `${input.name}: ${prefix}${value}`;
-          })
-          .join(", ");
-
-        self.logger.log(`    ${eventName}(${eventArgs})`);
-      });
-      self.logger.log("\n    ---------------------------");
       callback();
     }
   );

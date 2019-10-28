@@ -2,7 +2,8 @@ const exec = require("child_process").execSync;
 const command = {
     command: "matrix",
     description:
-        "Download Matrix AI Netwok Debug Chain Node and Browser and running them",
+        "Download Matrix AI Netwok Debug Chain Node and Browser and running them.\n"+
+        "The URL of blochain explorer is http://127.0.0.1:3000",
     builder: {},
     help: {
         usage: "truffle matrix",

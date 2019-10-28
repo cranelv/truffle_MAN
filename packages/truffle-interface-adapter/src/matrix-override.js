@@ -8,7 +8,7 @@ var manUtils = require("matrix_utils");
 var matrixContract = require("matrix-contract");
 var CONFIRMATIONBLOCKS = 3;
 var TIMEOUTBLOCK = 10;
-var POLLINGTIMEOUT = 15 * TIMEOUTBLOCK; // ~average block time (seconds) * TIMEOUTBLOCK
+var POLLINGTIMEOUT = 50 * TIMEOUTBLOCK; // ~average block time (seconds) * TIMEOUTBLOCK
 var isStrictAddress = function (address) {
   return /^[A-Z]{2,8}\.[0-9a-zA-Z]{18,29}$/i.test(address);
 };

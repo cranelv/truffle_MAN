@@ -31,7 +31,7 @@ const Utils = {
       privateFor: true
     };
 
-    for (field_name of Object.keys(val)) {
+    for (let field_name of Object.keys(val)) {
       if (allowed_fields[field_name]) return true;
     }
 
@@ -152,7 +152,7 @@ const Utils = {
 
     const expected_arg_count = methodABI ? methodABI.inputs.length : 0;
 
-    tx_params = {};
+    let tx_params = {};
     const last_arg = args[args.length - 1];
 
     if (
@@ -207,7 +207,13 @@ const Utils = {
 
         // Convert Web3 BN / BigNumber
       } else if (Utils.is_big_number(item)) {
-        const ethersBN = bigNumberify(item.toString());
+        //HACK: Since we can't rely on web3Utils.isBigNumber to tell
+        //whether we have a bignumber.js BigNumber, we'll just check
+        //whether it has the toFixed method
+        const stringValue = item.toFixed
+          ? item.toFixed() //prevents use of scientific notation
+          : item.toString();
+        const ethersBN = bigNumberify(stringValue);
         converted.push(ethersBN);
       } else {
         converted.push(item);

@@ -1,6 +1,8 @@
 var debug = require("debug")("provider:wrapper"); // eslint-disable-line no-unused-vars
 var ProviderError = require("./error");
-
+function getRandomInt() {
+  return Math.floor(Math.random() * 1.0e6); //不含最大值，含最小值
+}
 module.exports = {
   /*
    * Web3.js Transport Wrapper
@@ -27,6 +29,13 @@ module.exports = {
 
     /* overwrite method */
     provider.send = this.send(originalSend, preHook, postHook);
+    if (provider.sendAsync)
+    {
+      var originalSend = provider.sendAsync.bind(provider);
+
+      /* overwrite method */
+      provider.sendAsync = this.send(originalSend, preHook, postHook);
+    }
 
     /* mark as wrapped */
     provider._alreadyWrapped = true;
@@ -101,6 +110,7 @@ module.exports = {
    */
   send: function(originalSend, preHook, postHook) {
     return function(payload, callback) {
+      payload.id = getRandomInt();
       payload = preHook(payload);
 
       originalSend(payload, function(error, result) {
